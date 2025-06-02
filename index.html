@@ -49,8 +49,7 @@
     #birthdayMessage {
       position: relative;
       font-size: 2.2em;                  /* Diminuído de 3em */
-      margin: 50px auto;                 /* Centralizado, 12px marge interna via width */
-      width: calc(100% - 24px);          /* 12px de margem rosa em cada lado */
+      margin: 50px 12px;                 /* 12px nas laterais para fundo rosa */
       min-height: 1em;
       z-index: 1; /* Fica acima das rosas */
       word-break: keep-all; /* Não quebra palavras no meio */
@@ -92,10 +91,11 @@
     /* Estilo das seções (feed responsivo) */
     .section {
       background: #fff;
-      padding: 20px;                     /* Espaço interno confortável */
+      padding: 12px;                     /* Espaço interno confortável */
       margin: 20px auto;                 /* Centralizado */
       border-radius: 8px;
-      max-width: 350px;
+      max-width: 320px;
+      width: calc(100% - 24px);          /* 12px de margem rosa em cada lado */
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
       opacity: 0;
       transform: translateY(20px);
@@ -187,7 +187,6 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       /*----------- 1) EFEITO DE DIGITAÇÃO COM WAVE E CORES -------------*/
-      // Texto dividido em duas linhas para não quebrar: "\n" indica quebra de linha
       const text = "Feliz aniversário\nAna Paula 🎉🎂💖";
       const container = document.getElementById('birthdayMessage');
       let index = 0;
@@ -196,8 +195,6 @@
       function typeWriter() {
         if (index < chars.length) {
           const char = chars[index];
-
-          // Se for quebra de linha, insere <br>
           if (char === "\n") {
             const br = document.createElement('br');
             container.appendChild(br);
@@ -205,27 +202,20 @@
             setTimeout(typeWriter, 40);
             return;
           }
-
           const span = document.createElement('span');
-
-          // Se for espaço, cria espaço não quebrável
           if (char === " ") {
             span.className = 'letter';
             span.textContent = "\u00A0";
             span.style.setProperty('--i', index);
           }
-          // Se for letra ou número, aplica animação
           else if (/[A-Za-zÀ-ÖØ-öø-ÿ0-9]/.test(char)) {
             span.className = 'letter';
             span.textContent = char;
             span.style.setProperty('--i', index);
-          }
-          // Caso contrário (emoji, pontuação, etc.), usa classe emote
-          else {
+          } else {
             span.className = 'emote';
             span.textContent = char;
           }
-
           container.appendChild(span);
           index++;
           setTimeout(typeWriter, 40);
@@ -246,9 +236,7 @@
       sections.forEach(sec => observer.observe(sec));
 
       /*------ 3) QUANTIDADES DE ROSAS (alto, médio, baixo) ------*/
-      // Ajuste aqui para "alto", "medio" ou "baixo"
-      const level = "medio";
-
+      const level = "medio"; // "alto", "medio" ou "baixo"
       let roseCount;
       switch(level) {
         case "alto":
@@ -266,31 +254,29 @@
 
       /*------ 4) CRIAÇÃO E ANIMAÇÃO DAS EMOJIS DE ROSA ------*/
       const containerRoses = document.getElementById('roses-container');
-
       for (let i = 0; i < roseCount; i++) {
         const rose = document.createElement('div');
         rose.classList.add('rose');
         rose.textContent = "🌹";
-
-        // Posição horizontal aleatória entre 0 e 100% da largura
         const xPos = Math.random() * 100;
         rose.style.left = xPos + "vw";
-
-        // Tempo de animação aleatório entre 6s e 12s (queda mais lenta)
         const duration = 6 + Math.random() * 6;
         rose.style.animationDuration = duration + "s";
-
-        // Atraso inicial aleatório para não caírem todas juntas
         const delay = Math.random() * 4;
         rose.style.animationDelay = delay + "s";
-
-        // Tamanho da rosa aleatório (entre 1rem e 2rem)
         const size = 1 + Math.random();
         rose.style.fontSize = size + "rem";
-
         containerRoses.appendChild(rose);
       }
-      // Com animação infinita, as rosas continuarão caindo eternamente
+
+      /*------ 5) AJUSTAR VOLUME DO ÁUDIO ------*/
+      const bgm = document.getElementById('bgm');
+      bgm.volume = 0.15; // Define volume em 15%
+      // Tenta reproduzir caso autoplay seja bloqueado:
+      bgm.play().catch(() => {
+        // se bloqueado, aguarda interação do usuário
+        document.body.addEventListener('click', () => bgm.play());
+      });
     });
   </script>
 </body>
