@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feliz Aniversário Ana Paula</title>
+  <style>
+    /* -------------- ESTILOS GERAIS -------------- */
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+      color: #333;
+      text-align: center;
+      overflow-x: hidden; /* Evita barra horizontal por rosas */
+    }
+    /* Container das rosas caindo */
+    #roses-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+    /* Cada rosa individual */
+    .rose {
+      position: absolute;
+      top: -50px;
+      font-size: 1.5rem;
+      opacity: 0.8;
+      animation-name: fall;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite; /* Queda infinita */
+    }
+    /* Animação de queda da rosa */
+    @keyframes fall {
+      0%   { transform: translateY(0); opacity: 0.8; }
+      90%  { opacity: 0.8; }
+      100% { transform: translateY(110vh); opacity: 0; }
+    }
+
+    /* Mensagem principal com wave e mudança de cor */
+    #birthdayMessage {
+      position: relative;
+      font-size: 3em;
+      margin-top: 50px;
+      margin-bottom: 50px;
+      min-height: 1em;
+      z-index: 1; /* Fica acima das rosas */
+      white-space: pre-wrap; /* Preserva espaços */
+    }
+    /* Cada letra animada em onda (wave) e troca de cor */
+    #birthdayMessage .letter {
+      display: inline-block;
+      animation: wave 1.2s infinite ease-in-out both,
+                 colorChange 4s infinite linear; /* RGB mais lento */
+      animation-delay: calc(var(--i) * 0.1s), 0s;
+    }
+    /* Emojis sem animação de cor ou onda */
+    #birthdayMessage .emote {
+      display: inline-block;
+      color: #000; /* Mantém cor padrão nos emojis */
+    }
+    /* Animação de onda */
+    @keyframes wave {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-8px); }
+    }
+    /* Animação de mudança de cor */
+    @keyframes colorChange {
+      0%   { color: rgb(255, 0, 0); }       /* vermelho */
+      20%  { color: rgb(255, 127, 0); }     /* laranja */
+      40%  { color: rgb(255, 255, 0); }     /* amarelo */
+      60%  { color: rgb(0, 255, 0); }       /* verde */
+      80%  { color: rgb(0, 0, 255); }       /* azul */
+      100% { color: rgb(127, 0, 255); }     /* roxo */
+    }
+
+    /* Estilo das seções (feed responsivo) */
+    .section {
+      background: #fff;
+      padding: 20px; /* Aumentado de 15px para 20px */
+      margin: 20px auto;
+      border-radius: 8px;
+      max-width: 600px;
+      width: 90%;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.7s ease-out;
+      text-align: center;
+      position: relative;
+      z-index: 1; /* Ficam acima das rosas */
+    }
+    .section.animate {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .section h2 {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+      color: #444;
+    }
+    /* Imagens padronizadas em 3:4 e responsivas */
+    .section img {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Container das rosas caindo -->
+  <div id="roses-container"></div>
+
+  <!-- MENSAGEM PRINCIPAL -->
+  <h1 id="birthdayMessage"></h1>
+
+  <!-- TÓPICO 1: Ela é do pagode -->
+  <section class="section">
+    <h2>Ela é do pagode 🎶</h2>
+    <img src="images/IMG_Pagode.png" alt="Foto dela curtindo pagode">
+  </section>
+
+  <!-- TÓPICO 2: Ela quase fez carreira de DJ -->
+  <section class="section">
+    <h2>Ela quase fez carreira de DJ 🎧</h2>
+    <img src="images/IMG_DJ.png" alt="Foto dela como DJ">
+  </section>
+
+  <!-- TÓPICO 3: Ela é Maromba -->
+  <section class="section">
+    <h2>Ela é Maromba 💪</h2>
+    <img src="images/IMG_Maromba.png" alt="Foto dela na academia">
+  </section>
+
+  <!-- TÓPICO 4: Ela é Caricata -->
+  <section class="section">
+    <h2>Ela é Caricata 😜</h2>
+    <img src="images/IMG_Caricata.png" alt="Foto dela fazendo careta">
+  </section>
+
+  <!-- TÓPICO 5: Ela é Estudiosa -->
+  <section class="section">
+    <h2>Ela é Estudiosa 📚</h2>
+    <img src="images/IMG_Estudiosa.png" alt="Foto dela estudando">
+  </section>
+
+  <!-- TÓPICO 6: Ela é Romântica -->
+  <section class="section">
+    <h2>Ela é Romântica ❤️</h2>
+    <img src="images/IMG_Romantica.png" alt="Foto dela em clima romântico">
+  </section>
+
+  <!-- TÓPICO 7: Ela é do crime às vezes -->
+  <section class="section">
+    <h2>Ela é do crime às vezes 🚓</h2>
+    <img src="images/IMG_Crime.png" alt="Foto dela aprontando">
+  </section>
+
+  <!-- TÓPICO 8: Ela é Melhor Amiga -->
+  <section class="section">
+    <h2>Ela é Melhor Amiga 🤗</h2>
+    <img src="images/IMG_Amiga.png" alt="Foto dela com amigos">
+  </section>
+
+  <!-- SCRIPT PARA ANIMAÇÕES E ROSAS CAINDO -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      /*----------- 1) EFEITO DE DIGITAÇÃO COM WAVE E CORES -------------*/
+      const text = "Feliz Aniversário Ana Paula 🎉🎂💖";
+      const container = document.getElementById('birthdayMessage');
+      let index = 0;
+
+      function typeWriter() {
+        if (index < Array.from(text).length) {
+          const char = Array.from(text)[index];
+          const span = document.createElement('span');
+
+          // Se for espaço, cria um espaço visual
+          if (char === " ") {
+            span.className = 'letter';
+            span.textContent = "\u00A0"; // espaço não quebrável
+            span.style.setProperty('--i', index);
+          }
+          // Se for letra ou número, aplica animação
+          else if (/[A-Za-zÀ-ÖØ-öø-ÿ0-9]/.test(char)) {
+            span.className = 'letter';
+            span.textContent = char;
+            span.style.setProperty('--i', index);
+          } 
+          // Caso contrário (emoji, pontuação, etc.), usa a classe emote
+          else {
+            span.className = 'emote';
+            span.textContent = char;
+          }
+
+          container.appendChild(span);
+          index++;
+          setTimeout(typeWriter, 40);
+        }
+      }
+      typeWriter();
+
+      /*------ 2) INTERSECTIONOBSERVER PARA ANIMAR AS SEÇÕES ------*/
+      const sections = document.querySelectorAll('.section');
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate');
+            obs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.5 });
+      sections.forEach(sec => observer.observe(sec));
+
+      /*------ 3) QUANTIDADES DE ROSAS (alto, médio, baixo) ------*/
+      // Ajuste aqui para "alto", "medio" ou "baixo"
+      const level = "medio";
+
+      let roseCount;
+      switch(level) {
+        case "alto":
+          roseCount = 60;
+          break;
+        case "medio":
+          roseCount = 30;
+          break;
+        case "baixo":
+          roseCount = 10;
+          break;
+        default:
+          roseCount = 20;
+      }
+
+      /*------ 4) CRIAÇÃO E ANIMAÇÃO DAS EMOJIS DE ROSA ------*/
+      const containerRoses = document.getElementById('roses-container');
+
+      for (let i = 0; i < roseCount; i++) {
+        const rose = document.createElement('div');
+        rose.classList.add('rose');
+        rose.textContent = "🌹";
+
+        // Posição horizontal aleatória entre 0 e 100% da largura
+        const xPos = Math.random() * 100;
+        rose.style.left = xPos + "vw";
+
+        // Tempo de animação aleatório entre 6s e 12s (queda mais lenta)
+        const duration = 6 + Math.random() * 6;
+        rose.style.animationDuration = duration + "s";
+
+        // Atraso inicial aleatório para não caírem todas juntas
+        const delay = Math.random() * 4;
+        rose.style.animationDelay = delay + "s";
+
+        // Tamanho da rosa aleatório (entre 1rem e 2rem)
+        const size = 1 + Math.random();
+        rose.style.fontSize = size + "rem";
+
+        containerRoses.appendChild(rose);
+      }
+      // Com animação infinita, as rosas continuam reaparecendo e caindo
+    });
+  </script>
+</body>
+</html>
