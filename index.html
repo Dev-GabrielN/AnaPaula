@@ -167,14 +167,15 @@
 
   <!-- TÓPICO 6: Ela é Romântica -->
   <section class="section">
-    <h2>Ela é Romântica ❤️</h2>
-    <img src="images/IMG_Romantica.png" alt="Foto dela em clima romântico">
+    <h2>Ela é do crime às vezes 🚓</h2>
+    <img src="images/IMG_Crime.png" alt="Foto dela aprontando">
   </section>
+
 
   <!-- TÓPICO 7: Ela é do crime às vezes -->
   <section class="section">
-    <h2>Ela é do crime às vezes 🚓</h2>
-    <img src="images/IMG_Crime.png" alt="Foto dela aprontando">
+    <h2>Ela é Romântica ❤️</h2>
+    <img src="images/IMG_Romantica.png" alt="Foto dela em clima romântico">
   </section>
 
   <!-- TÓPICO 8: Ela é Melhor Amiga -->
@@ -269,14 +270,14 @@
         containerRoses.appendChild(rose);
       }
 
-      /*------ 5) AJUSTAR VOLUME DO ÁUDIO ------*/
+      /*------ 5) AJUSTAR VOLUME DO ÁUDIO E INICIAR NO SCROLL ------*/
       const bgm = document.getElementById('bgm');
       bgm.volume = 0.15; // Define volume em 15%
-      // Tenta reproduzir caso autoplay seja bloqueado:
-      bgm.play().catch(() => {
-        // se bloqueado, aguarda interação do usuário
-        document.body.addEventListener('click', () => bgm.play());
-      });
+      function playOnScroll() {
+        bgm.play().catch(() => { /* ignorar erro se ainda bloqueado */ });
+        document.removeEventListener('scroll', playOnScroll);
+      }
+      document.addEventListener('scroll', playOnScroll);
     });
   </script>
 </body>
