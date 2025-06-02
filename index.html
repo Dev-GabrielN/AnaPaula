@@ -14,6 +14,7 @@
       text-align: center;
       overflow-x: hidden; /* Evita barra horizontal por rosas */
     }
+
     /* Container das rosas caindo */
     #roses-container {
       position: fixed;
@@ -25,6 +26,7 @@
       overflow: hidden;
       z-index: 0;
     }
+
     /* Cada rosa individual */
     .rose {
       position: absolute;
@@ -35,6 +37,7 @@
       animation-timing-function: linear;
       animation-iteration-count: infinite; /* Queda infinita */
     }
+
     /* Animação de queda da rosa */
     @keyframes fall {
       0%   { transform: translateY(0); opacity: 0.8; }
@@ -45,13 +48,17 @@
     /* Mensagem principal com wave e mudança de cor */
     #birthdayMessage {
       position: relative;
-      font-size: 3em;
-      margin-top: 50px;
-      margin-bottom: 50px;
+      font-size: 2.2em;                  /* Diminuído de 3em */
+      margin: 50px auto;                 /* Centralizado, 12px marge interna via width */
+      width: calc(100% - 24px);          /* 12px de margem rosa em cada lado */
       min-height: 1em;
       z-index: 1; /* Fica acima das rosas */
-      white-space: pre-wrap; /* Preserva espaços */
+      word-break: keep-all; /* Não quebra palavras no meio */
+      overflow-wrap: normal;
+      white-space: pre-wrap; /* Preserva espaços e quebras */
+      text-align: center;
     }
+
     /* Cada letra animada em onda (wave) e troca de cor */
     #birthdayMessage .letter {
       display: inline-block;
@@ -59,16 +66,19 @@
                  colorChange 4s infinite linear; /* RGB mais lento */
       animation-delay: calc(var(--i) * 0.1s), 0s;
     }
+
     /* Emojis sem animação de cor ou onda */
     #birthdayMessage .emote {
       display: inline-block;
       color: #000; /* Mantém cor padrão nos emojis */
     }
+
     /* Animação de onda */
     @keyframes wave {
       0%, 100% { transform: translateY(0); }
       50%      { transform: translateY(-8px); }
     }
+
     /* Animação de mudança de cor */
     @keyframes colorChange {
       0%   { color: rgb(255, 0, 0); }       /* vermelho */
@@ -82,15 +92,14 @@
     /* Estilo das seções (feed responsivo) */
     .section {
       background: #fff;
-      padding: 20px; /* Aumentado de 15px para 20px */
-      margin: 20px auto;
+      padding: 20px;                     /* Espaço interno confortável */
+      margin: 20px auto;                 /* Centralizado */
       border-radius: 8px;
-      max-width: 600px;
-      width: 90%;
+      max-width: 350px;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
       opacity: 0;
       transform: translateY(20px);
-      transition: all 0.7s ease-out;
+      transition: all 0.8s ease-out;
       text-align: center;
       position: relative;
       z-index: 1; /* Ficam acima das rosas */
@@ -104,6 +113,7 @@
       margin-bottom: 10px;
       color: #444;
     }
+
     /* Imagens padronizadas em 3:4 e responsivas */
     .section img {
       width: 100%;
@@ -118,7 +128,11 @@
   <!-- Container das rosas caindo -->
   <div id="roses-container"></div>
 
-  <!-- MENSAGEM PRINCIPAL -->
+  <!-- ÁUDIO DE FUNDO -->
+  <!-- Coloque o arquivo na pasta audio/ com nome musica.mp3 -->
+  <audio id="bgm" src="audio/musica.mp3" autoplay loop></audio>
+
+  <!-- MENSAGEM PRINCIPAL: duas linhas para não quebrar no meio -->
   <h1 id="birthdayMessage"></h1>
 
   <!-- TÓPICO 1: Ela é do pagode -->
@@ -173,19 +187,31 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       /*----------- 1) EFEITO DE DIGITAÇÃO COM WAVE E CORES -------------*/
-      const text = "Feliz Aniversário Ana Paula 🎉🎂💖";
+      // Texto dividido em duas linhas para não quebrar: "\n" indica quebra de linha
+      const text = "Feliz aniversário\nAna Paula 🎉🎂💖";
       const container = document.getElementById('birthdayMessage');
       let index = 0;
+      const chars = Array.from(text);
 
       function typeWriter() {
-        if (index < Array.from(text).length) {
-          const char = Array.from(text)[index];
+        if (index < chars.length) {
+          const char = chars[index];
+
+          // Se for quebra de linha, insere <br>
+          if (char === "\n") {
+            const br = document.createElement('br');
+            container.appendChild(br);
+            index++;
+            setTimeout(typeWriter, 40);
+            return;
+          }
+
           const span = document.createElement('span');
 
-          // Se for espaço, cria um espaço visual
+          // Se for espaço, cria espaço não quebrável
           if (char === " ") {
             span.className = 'letter';
-            span.textContent = "\u00A0"; // espaço não quebrável
+            span.textContent = "\u00A0";
             span.style.setProperty('--i', index);
           }
           // Se for letra ou número, aplica animação
@@ -193,8 +219,8 @@
             span.className = 'letter';
             span.textContent = char;
             span.style.setProperty('--i', index);
-          } 
-          // Caso contrário (emoji, pontuação, etc.), usa a classe emote
+          }
+          // Caso contrário (emoji, pontuação, etc.), usa classe emote
           else {
             span.className = 'emote';
             span.textContent = char;
@@ -264,7 +290,7 @@
 
         containerRoses.appendChild(rose);
       }
-      // Com animação infinita, as rosas continuam reaparecendo e caindo
+      // Com animação infinita, as rosas continuarão caindo eternamente
     });
   </script>
 </body>
