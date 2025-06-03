@@ -506,7 +506,6 @@
         'images/IMG_Amiga.png',
         'images/IMG_Cachoeira.png',
         'images/IMG_Potassio.png',
-        'audio/musica.mp3',
       ];
   
       let loadedImages = 0;
@@ -547,7 +546,7 @@
       // Variáveis para controlar scroll automático e inatividade
       let scrollInterval = null;
       let inactivityTimer = null;
-      let musicAutoStarted = false; // marca se a música já foi iniciada automaticamente
+      let musicAutoStarted = false; // marca se a música já foi iniciada pela primeira interação
   
       /*====== FUNÇÃO DE SCROLL AUTOMÁTICO ======*/
       function autoScroll() {
@@ -562,27 +561,11 @@
         }, 20);
       }
   
-      /*====== FUNÇÃO PARA INICIAR MÚSICA + SCROLL ======*/
-      function startAutoFlow() {
-        if (!musicAutoStarted) {
-          // 1) Garante que o <audio> comece a carregar
-          bgm.load();
-      
-          // 2) Espera o evento 'canplay' para ter metadata e áudio suficientes
-          bgm.addEventListener('canplay', function onceCanPlay() {
-            // Toca somente quando já puder iniciar sem erro
-            bgm.play().catch(() => {});
-            playPauseBtn.textContent = '❚❚';
-            musicAutoStarted = true;
-      
-            // Remover este listener para não disparar de novo
-            bgm.removeEventListener('canplay', onceCanPlay);
-          }, { once: true });
-        }
-      
+      /*====== FUNÇÃO PARA INICIAR AUTOMATICAMENTE O SCROLL (SÓ) ======*/
+      function startAutoScroll() {
         autoScroll();
       }
-      
+  
       /*====== FUNÇÃO PARA PARAR SCROLL AUTOMÁTICO E AGUARDAR 5s ======*/
       function stopAutoScroll() {
         if (scrollInterval) {
@@ -591,7 +574,7 @@
         }
         clearTimeout(inactivityTimer);
         inactivityTimer = setTimeout(() => {
-          startAutoFlow();
+          startAutoScroll();
         }, 5000);
       }
   
@@ -640,6 +623,9 @@
         // Desabilita a barra até carregar metadata
         audioProgress.disabled = true;
   
+        // Força início do preload do áudio
+        bgm.load();
+  
         // Assim que carregam metadados (incluindo duração correta):
         bgm.addEventListener('loadedmetadata', () => {
           // Fazemos o range de 0 a 100 (porcentagem)
@@ -659,7 +645,7 @@
           }
         });
   
-        // Play/Pause no clique → para o scroll automático
+        // Play/Pause no clique → sempre necessário interação para tocar/parar
         playPauseBtn.addEventListener('click', () => {
           if (isNaN(bgm.duration) || bgm.duration === 0) return;
           if (bgm.paused) {
@@ -688,22 +674,26 @@
           playPauseBtn.textContent = '►';
         });
   
-        // Quando o usuário fizer scroll manual (rodar roda do mouse ou deslizar tela),
-        // interrompe o scroll automático e inicia o timer de 5s
+        // Na PRIMEIRA vez que o usuário rolar manualmente, tocar + scroll
+        function onFirstUserScroll() {
+          window.removeEventListener('wheel', onFirstUserScroll);
+          window.removeEventListener('touchstart', onFirstUserScroll);
+          // Toca a música (agora em resposta a gesto do usuário)
+          bgm.play().catch(() => {});
+          playPauseBtn.textContent = '❚❚';
+          musicAutoStarted = true;
+          // Inicia o auto scroll
+          autoScroll();
+        }
+        window.addEventListener('wheel', onFirstUserScroll, { passive: true });
+        window.addEventListener('touchstart', onFirstUserScroll, { passive: true });
+  
+        // A CADA scroll manual, interrompe o auto scroll e reinicia timer de 5s
         function onUserScroll() {
           stopAutoScroll();
         }
         window.addEventListener('wheel', onUserScroll, { passive: true });
         window.addEventListener('touchstart', onUserScroll, { passive: true });
-  
-        // O startAutoFlow só dispara na PRIMEIRA vez que o usuário fizer scroll manual
-        function onFirstUserScroll() {
-          window.removeEventListener('wheel', onFirstUserScroll);
-          window.removeEventListener('touchstart', onFirstUserScroll);
-          startAutoFlow();
-        }
-        window.addEventListener('wheel', onFirstUserScroll, { passive: true });
-        window.addEventListener('touchstart', onFirstUserScroll, { passive: true });
       }
   
       // Define o volume em 20%
