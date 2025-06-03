@@ -516,9 +516,8 @@
 
         bgm.addEventListener('timeupdate', () => {
           if (!isNaN(bgm.duration) && bgm.duration > 0) {
-            // converte currentTime em % de 0–100
             const percent = (bgm.currentTime / bgm.duration) * 100;
-            audioProgress.value = (percent - 5);
+            audioProgress.value = percent;
             updateProgressBarBackground();
             updateTimeDisplay();
           }
@@ -570,8 +569,13 @@
       function updateProgressBarBackground() {
         if (!bgm.duration || isNaN(bgm.duration)) return;
         const percent = (bgm.currentTime / bgm.duration) * 100;
-        audioProgress.style.background =
-          `linear-gradient(to right, #e91e63 0%, #e91e63 ${percent}%, #f0f0f0 ${percent}%, #f0f0f0 100%)`;
+      
+        // Defina a “track” de fundo em cinza claro
+        audioProgress.style.backgroundColor = '#f0f0f0';
+        // O “fill” rosa por cima, com largura exatamente em percent%
+        audioProgress.style.backgroundImage = 'linear-gradient(to right, #e91e63, #e91e63)';
+        audioProgress.style.backgroundRepeat = 'no-repeat';
+        audioProgress.style.backgroundSize = `${percent}% 100%`;
       }
     });
   </script>
