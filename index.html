@@ -98,10 +98,23 @@
 
     #birthdayMessage .letter {
       display: inline-block;
-      animation: wave 1.2s infinite ease-in-out both,
-                 colorChange 4s infinite linear;
-      animation-delay: calc(var(--i) * 0.1s), 0s;
+    
+      /* ==== FORÇAR ACELERAÇÃO POR GPU ==== */
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      will-change: transform, color;
+      text-rendering: optimizeLegibility;
+    
+      /* ==== ANIMAÇÕES MAIS SUAVES ==== */
+      animation: 
+        wave 1.2s infinite cubic-bezier(0.645, 0.045, 0.355, 1) both,
+        colorChange 6s infinite ease-in-out;
+      animation-delay: calc(var(--i) * 0.1s), calc(var(--i) * 0.1s);
+    
+      /* diminuímos ligeiramente a frequência da troca de cor (6s em vez de 4s),
+         e ajustamos o easing para ficar mais fluido (ease-in-out custom). */
     }
+    
 
     #birthdayMessage .emote {
       display: inline-block;
@@ -109,9 +122,10 @@
     }
 
     @keyframes wave {
-      0%, 100% { transform: translateY(0); }
-      50%      { transform: translateY(-8px); }
+      0%, 100% { transform: translate3d(0, 0, 0); }
+      50%      { transform: translate3d(0, -8px, 0); }
     }
+    
 
     @keyframes colorChange {
       0%   { color: rgb(255, 0, 0); }
@@ -308,13 +322,38 @@
   </section>
 
   <section class="section">
-    <h2>Ela quase fez carreira de DJ 🎧</h2>
+    <h2>Ela quase virou DJ 🎧</h2>
     <img src="images/IMG_DJ.png" alt="Foto dela como DJ" />
   </section>
 
   <section class="section">
     <h2>Ela é Maromba 💪</h2>
     <img src="images/IMG_Maromba.png" alt="Foto dela na academia" />
+  </section>
+
+  <section class="section">
+    <h2>Ela é Amorosa 🥰</h2>
+    <img src="images/IMG_Amizades.png" alt="Foto dela na academia" />
+  </section>
+
+  <section class="section">
+    <h2>Ela Adora Cachoeira 🏞️</h2>
+    <img src="images/IMG_Cachoeira.png" alt="..." />
+  </section>
+
+  <section class="section">
+    <h2>Ela é Charmosa 😘</h2>
+    <img src="images/IMG_Amordemaiz.png" alt="Foto dela na academia" />
+  </section>
+
+  <section class="section">
+    <h2>Ela Adora Animais 🐳</h2>
+    <img src="images/IMG_Animais.png" alt="..." />
+  </section>
+  
+  <section class="section">
+    <h2>Ela Tem classe 🍷</h2>
+    <img src="images/IMG_TemClasse.png" alt="..." />
   </section>
 
   <section class="section">
@@ -338,6 +377,11 @@
   </section>
 
   <section class="section">
+    <h2>Ela é Mãe de Pet 🦴</h2>
+    <img src="images/IMG_Potassio.png" alt="..." />
+  </section>
+
+  <section class="section">
     <h2>Ela é Incrível! ⭐</h2>
     <img src="images/IMG_Amiga.png" alt="Foto dela com amigos" />
   </section>
@@ -355,22 +399,28 @@
       const container = document.getElementById('birthdayMessage');
       let index = 0;
       const chars = Array.from(text);
-
+      
       function typeWriter() {
         if (index < chars.length) {
           const char = chars[index];
           if (char === "\n") {
-            container.appendChild(document.createElement('br'));
+            const br = document.createElement('br');
+            container.appendChild(br);
             index++;
-            setTimeout(typeWriter, 40);
+            requestAnimationFrame(typeWriter);
             return;
           }
+      
+          // === Criar o <span> invisível primeiro ===
           const span = document.createElement('span');
+          span.style.opacity = '0';
+          span.style.transition = 'opacity 0.2s ease-in';
           if (char === " ") {
             span.className = 'letter';
             span.textContent = "\u00A0";
             span.style.setProperty('--i', index);
-          } else if (/[A-Za-zÀ-ÖØ-öø-ÿ0-9]/.test(char)) {
+          }
+          else if (/[A-Za-zÀ-ÖØ-öø-ÿ0-9]/.test(char)) {
             span.className = 'letter';
             span.textContent = char;
             span.style.setProperty('--i', index);
@@ -378,12 +428,20 @@
             span.className = 'emote';
             span.textContent = char;
           }
+      
           container.appendChild(span);
+      
+          // === Forçar DOM a “reconhecer” o span antes de animar ===
+          requestAnimationFrame(() => {
+            span.style.opacity = '1'; // agora o .letter já está no DOM, inicia a wave+colorChange com suavidade
+          });
+      
           index++;
           setTimeout(typeWriter, 40);
         }
       }
       typeWriter();
+      
 
       /*------ 2) QUANTIDADE DE ROSAS ------*/
       const level = "medio";
@@ -421,7 +479,9 @@
         'images/IMG_Estudiosa.png',
         'images/IMG_Romantica.png',
         'images/IMG_Crime.png',
-        'images/IMG_Amiga.png'
+        'images/IMG_Amiga.png',
+        'images/IMG_Cachoeira.png',
+        'images/IMG_Potassio.png',
       ];
 
       let loadedImages = 0;
@@ -551,6 +611,8 @@
           playPauseBtn.textContent = '►';
         });
       }
+      // Define o volume em 20%
+      bgm.volume = 0.2;
 
       // Formata segundos em mm:ss
       function formatTime(sec) {
