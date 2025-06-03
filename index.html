@@ -563,15 +563,25 @@
   
       /*====== FUNÇÃO PARA INICIAR MÚSICA + SCROLL ======*/
       function startAutoFlow() {
-        // Apenas inicia música uma vez, se não foi iniciada automaticamente e não estiver tocando
         if (!musicAutoStarted) {
-          bgm.play().catch(() => {});
-          playPauseBtn.textContent = '❚❚';
-          musicAutoStarted = true;
+          // 1) Garante que o <audio> comece a carregar
+          bgm.load();
+      
+          // 2) Espera o evento 'canplay' para ter metadata e áudio suficientes
+          bgm.addEventListener('canplay', function onceCanPlay() {
+            // Toca somente quando já puder iniciar sem erro
+            bgm.play().catch(() => {});
+            playPauseBtn.textContent = '❚❚';
+            musicAutoStarted = true;
+      
+            // Remover este listener para não disparar de novo
+            bgm.removeEventListener('canplay', onceCanPlay);
+          }, { once: true });
         }
+      
         autoScroll();
       }
-  
+      
       /*====== FUNÇÃO PARA PARAR SCROLL AUTOMÁTICO E AGUARDAR 5s ======*/
       function stopAutoScroll() {
         if (scrollInterval) {
