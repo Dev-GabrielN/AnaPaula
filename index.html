@@ -12,7 +12,7 @@
     }
     @media (max-width: 480px) {
       #audioWidget {
-        padding: 8px;       /* men­­os “respiro” interno */
+        padding: 8px;       /* menos “respiro” interno */
         max-width: 100%;    /* ocupa toda a largura possível */
         margin: 0 8px 20px; /* margens laterais pequenas */
       }
@@ -124,23 +124,21 @@
 
     #birthdayMessage .letter {
       display: inline-block;
-    
+
       /* ==== FORÇAR ACELERAÇÃO POR GPU ==== */
       transform: translateZ(0);
       backface-visibility: hidden;
       will-change: transform, color;
       text-rendering: optimizeLegibility;
-    
+
       /* ==== ANIMAÇÕES MAIS SUAVES ==== */
       animation: 
         wave 1.2s infinite cubic-bezier(0.645, 0.045, 0.355, 1) both,
         colorChange 6s infinite ease-in-out;
       animation-delay: calc(var(--i) * 0.1s), calc(var(--i) * 0.1s);
-    
-      /* diminuímos ligeiramente a frequência da troca de cor (6s em vez de 4s),
-         e ajustamos o easing para ficar mais fluido (ease-in-out custom). */
+
+      /* duração maior e easing ajustado para suavizar troca de cores */
     }
-    
 
     #birthdayMessage .emote {
       display: inline-block;
@@ -151,7 +149,6 @@
       0%, 100% { transform: translate3d(0, 0, 0); }
       50%      { transform: translate3d(0, -8px, 0); }
     }
-    
 
     @keyframes colorChange {
       0%   { color: rgb(255, 0, 0); }
@@ -361,7 +358,7 @@
 
   <section class="section">
     <h2>Ela é Amorosa 🥰</h2>
-    <img src="images/IMG_Amizades.png" alt="Foto dela na academia" />
+    <img src="images/IMG_Amizades.png" alt="Foto dela com amigos" />
   </section>
 
   <section class="section">
@@ -371,17 +368,17 @@
 
   <section class="section">
     <h2>Ela é Charmosa 😘</h2>
-    <img src="images/IMG_Amordemaiz.png" alt="Foto dela na academia" />
+    <img src="images/IMG_Amordemaiz.png" alt="Foto dela charmosa" />
   </section>
 
   <section class="section">
     <h2>Ela Adora Animais 🐳</h2>
-    <img src="images/IMG_Animais.png" alt="..." />
+    <img src="images/IMG_Animais.png" alt="Foto dela com animais" />
   </section>
   
   <section class="section">
     <h2>Ela Tem classe 🍷</h2>
-    <img src="images/IMG_TemClasse.png" alt="..." />
+    <img src="images/IMG_TemClasse.png" alt="Foto dela elegante" />
   </section>
 
   <section class="section">
@@ -406,7 +403,7 @@
 
   <section class="section">
     <h2>Ela é Mãe de Pet 🦴</h2>
-    <img src="images/IMG_Potassio.png" alt="..." />
+    <img src="images/IMG_Potassio.png" alt="Foto dela com pet" />
   </section>
 
   <section class="section">
@@ -421,13 +418,13 @@
       const progressBar     = document.getElementById('loading-progress-bar');
       const loadingMessage  = document.getElementById('loading-message');
       window.scrollTo(0, 0);
-
+  
       /*----------- 1) EFEITO DE DIGITAÇÃO -------------*/
       const text = "Feliz aniversário\nAna Paula 🎉🎂💖";
       const container = document.getElementById('birthdayMessage');
       let index = 0;
       const chars = Array.from(text);
-      
+  
       function typeWriter() {
         if (index < chars.length) {
           const char = chars[index];
@@ -438,7 +435,7 @@
             requestAnimationFrame(typeWriter);
             return;
           }
-      
+  
           // === Criar o <span> invisível primeiro ===
           const span = document.createElement('span');
           span.style.opacity = '0';
@@ -456,21 +453,20 @@
             span.className = 'emote';
             span.textContent = char;
           }
-      
+  
           container.appendChild(span);
-      
+  
           // === Forçar DOM a “reconhecer” o span antes de animar ===
           requestAnimationFrame(() => {
-            span.style.opacity = '1'; // agora o .letter já está no DOM, inicia a wave+colorChange com suavidade
+            span.style.opacity = '1';
           });
-      
+  
           index++;
           setTimeout(typeWriter, 40);
         }
       }
       typeWriter();
-      
-
+  
       /*------ 2) QUANTIDADE DE ROSAS ------*/
       const level = "medio";
       let roseCount;
@@ -480,7 +476,7 @@
         case "baixo":  roseCount = 10; break;
         default:       roseCount = 20;
       }
-
+  
       /*------ 3) ANIMAÇÃO DAS ROSAS ------*/
       const containerRoses = document.getElementById('roses-container');
       for (let i = 0; i < roseCount; i++) {
@@ -497,7 +493,7 @@
         rose.style.fontSize = size + "rem";
         containerRoses.appendChild(rose);
       }
-
+  
       /*------ 4) PRÉ-CARREGAMENTO DE IMAGENS ------*/
       const imageUrls = [
         'images/IMG_Pagode.png',
@@ -511,10 +507,10 @@
         'images/IMG_Cachoeira.png',
         'images/IMG_Potassio.png',
       ];
-
+  
       let loadedImages = 0;
       const totalImages = imageUrls.length;
-
+  
       function preloadImage(url) {
         return new Promise((resolve, reject) => {
           const img = new Image();
@@ -527,17 +523,17 @@
           img.onerror = reject;
         });
       }
-
+  
       function updateProgress() {
         const percent = Math.floor((loadedImages / totalImages) * 100);
         progressBar.style.width       = percent + '%';
         loadingMessage.textContent    = percent + '%';
       }
-
+  
       function preloadAllImages() {
         return Promise.all(imageUrls.map(url => preloadImage(url)));
       }
-
+  
       /*------ 5) ELEMENTOS DE ÁUDIO E VÍDEO ------*/
       const bgm           = document.getElementById('bgm');
       const audioWidget   = document.getElementById('audioWidget');
@@ -546,7 +542,48 @@
       const timeDisplay   = document.getElementById('timeDisplay');
       const videoBg       = document.querySelector('#audioWidget .audio-bg');
       let firstSectionSeen = false;
-
+  
+      // Variáveis para controlar scroll automático e inatividade
+      let scrollInterval = null;
+      let inactivityTimer = null;
+      let musicAutoStarted = false; // marca se a música já foi iniciada automaticamente
+  
+      /*====== FUNÇÃO DE SCROLL AUTOMÁTICO ======*/
+      function autoScroll() {
+        if (scrollInterval) return;
+        scrollInterval = setInterval(() => {
+          if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+            clearInterval(scrollInterval);
+            scrollInterval = null;
+          } else {
+            window.scrollBy(0, 1);
+          }
+        }, 20);
+      }
+  
+      /*====== FUNÇÃO PARA INICIAR MÚSICA + SCROLL ======*/
+      function startAutoFlow() {
+        // Apenas inicia música uma vez, se não foi iniciada automaticamente e não estiver tocando
+        if (!musicAutoStarted) {
+          bgm.play().catch(() => {});
+          playPauseBtn.textContent = '❚❚';
+          musicAutoStarted = true;
+        }
+        autoScroll();
+      }
+  
+      /*====== FUNÇÃO PARA PARAR SCROLL AUTOMÁTICO E AGUARDAR 5s ======*/
+      function stopAutoScroll() {
+        if (scrollInterval) {
+          clearInterval(scrollInterval);
+          scrollInterval = null;
+        }
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+          startAutoFlow();
+        }, 5000);
+      }
+  
       /*------ 6) REMOÇÃO DO LOADING COM DELAY DE 1s ------*/
       preloadAllImages()
         .catch(() => console.log("Algumas imagens não carregaram"))
@@ -557,15 +594,15 @@
             setTimeout(() => {
               loadingScreen.style.display = 'none';
               document.body.classList.remove('loading');
-
-              // Inicia observador de interseção
+  
+              // Inicia observador de interseção para animar seções
               const sections = document.querySelectorAll('.section');
               const observer = new IntersectionObserver((entries, obs) => {
                 entries.forEach(entry => {
                   if (entry.isIntersecting) {
                     entry.target.classList.add('animate');
                     obs.unobserve(entry.target);
-
+  
                     // Assim que o primeiro card animar, mostramos o widget
                     if (!firstSectionSeen) {
                       firstSectionSeen = true;
@@ -574,24 +611,24 @@
                   }
                 });
               }, { threshold: 0.1 });
-
+  
               sections.forEach(sec => observer.observe(sec));
               window.scrollTo(0, 0);
             }, 500);
           }, 1000);
         });
-
+  
       /*====== FUNÇÃO PARA EXIBIR E CONTROLAR O WIDGET DE ÁUDIO ======*/
       function showAudioWidget() {
         // Exibe o widget
         audioWidget.style.display = 'block';
-
-        // Ajusta vídeo de fundo para 10% de velocidade
+  
+        // Ajusta vídeo de fundo para 50% de velocidade
         videoBg.playbackRate = 0.5;
-
+  
         // Desabilita a barra até carregar metadata
         audioProgress.disabled = true;
-
+  
         // Assim que carregam metadados (incluindo duração correta):
         bgm.addEventListener('loadedmetadata', () => {
           // Fazemos o range de 0 a 100 (porcentagem)
@@ -600,8 +637,8 @@
           updateProgressBarBackground();
           updateTimeDisplay();
         });
-        
-
+  
+        // Atualiza posição da barra conforme o áudio toca
         bgm.addEventListener('timeupdate', () => {
           if (!isNaN(bgm.duration) && bgm.duration > 0) {
             const percent = (bgm.currentTime / bgm.duration) * 100;
@@ -610,51 +647,70 @@
             updateTimeDisplay();
           }
         });
-
-        // Play/Pause no clique
+  
+        // Play/Pause no clique → para o scroll automático
         playPauseBtn.addEventListener('click', () => {
-          // Se a duração ainda estiver zerada, ignoramos o play até carregar metadata
           if (isNaN(bgm.duration) || bgm.duration === 0) return;
           if (bgm.paused) {
-            bgm.play();
+            bgm.play().catch(() => {});
             playPauseBtn.textContent = '❚❚';
           } else {
             bgm.pause();
             playPauseBtn.textContent = '►';
           }
+          stopAutoScroll();
         });
-
-        // Ao arrastar a barra, faz seek no áudio
+  
+        // Ao arrastar a barra, faz seek no áudio e para scroll automático
         audioProgress.addEventListener('input', () => {
           if (!isNaN(bgm.duration) && bgm.duration > 0) {
-            // converte valor (0–100) de volta para segundos
             const seconds = (parseFloat(audioProgress.value) / 100) * bgm.duration;
             bgm.currentTime = seconds;
             updateProgressBarBackground();
+            updateTimeDisplay();
           }
+          stopAutoScroll();
         });
-
+  
         // Quando a música terminar, volta o botão para “play”
         bgm.addEventListener('ended', () => {
           playPauseBtn.textContent = '►';
         });
+  
+        // Quando o usuário fizer scroll manual (rodar roda do mouse ou deslizar tela),
+        // interrompe o scroll automático e inicia o timer de 5s
+        function onUserScroll() {
+          stopAutoScroll();
+        }
+        window.addEventListener('wheel', onUserScroll, { passive: true });
+        window.addEventListener('touchstart', onUserScroll, { passive: true });
+  
+        // O startAutoFlow só dispara na PRIMEIRA vez que o usuário fizer scroll manual
+        function onFirstUserScroll() {
+          window.removeEventListener('wheel', onFirstUserScroll);
+          window.removeEventListener('touchstart', onFirstUserScroll);
+          startAutoFlow();
+        }
+        window.addEventListener('wheel', onFirstUserScroll, { passive: true });
+        window.addEventListener('touchstart', onFirstUserScroll, { passive: true });
       }
+  
       // Define o volume em 20%
       bgm.volume = 0.2;
-
+  
       // Formata segundos em mm:ss
       function formatTime(sec) {
         const minutes = Math.floor(sec / 60);
         const seconds = Math.floor(sec % 60);
         return String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
       }
-
+  
       function updateTimeDisplay() {
         const current = formatTime(bgm.currentTime);
         const total = isNaN(bgm.duration) ? '00:00' : formatTime(bgm.duration);
         timeDisplay.textContent = `${current} / ${total}`;
       }
-
+  
       // Atualiza o background da barra para mostrar preenchimento rosa
       function updateProgressBarBackground() {
         if (!bgm.duration || isNaN(bgm.duration)) return;
@@ -669,5 +725,7 @@
       }
     });
   </script>
+  
+  
 </body>
 </html>
