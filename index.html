@@ -1,693 +1,799 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Feliz Aniversário Ana Paula</title>
-  <style>
-    /* ========== ESTILOS DE CARREGAMENTO ========== */
-    body.loading {
-      overflow: hidden;
-      height: 100vh;
-    }
-    @media (max-width: 480px) {
-      #audioWidget {
-        padding: 8px;       /* menos “respiro” interno */
-        max-width: 100%;    /* ocupa toda a largura possível */
-        margin: 0 8px 20px; /* margens laterais pequenas */
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Feliz Aniversário Ana Paula</title>
+    <style>
+      /* ========== ESTILOS DE CARREGAMENTO ========== */
+      body.loading {
+        overflow: hidden;
+        height: 100vh;
       }
-    
-      /* Botão um pouco menor */
-      #audioWidget button {
-        width: 36px;
-        height: 36px;
+      @media (max-width: 480px) {
+        #audioWidget {
+          padding: 8px; /* menos “respiro” interno */
+          max-width: 100%; /* ocupa toda a largura possível */
+          margin: 0 8px 20px; /* margens laterais pequenas */
+        }
+
+        /* Botão um pouco menor */
+        #audioWidget button {
+          width: 36px;
+          height: 36px;
+          font-size: 1.2em;
+          margin-bottom: 8px;
+        }
+
+        /* Barra de progresso mais fina */
+        #audioWidget input[type="range"] {
+          height: 4px;
+        }
+
+        /* Texto de tempo um pouquinho menor */
+        #audioWidget .time-display {
+          font-size: 0.8em;
+          min-width: 50px;
+        }
+      }
+
+      #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        transition: opacity 0.5s ease;
+      }
+
+      #loading-progress {
+        width: 80%;
+        max-width: 300px;
+        height: 10px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 5px;
+        margin-top: 20px;
+        overflow: hidden;
+      }
+
+      #loading-progress-bar {
+        height: 100%;
+        width: 0%;
+        background: #e91e63;
+        transition: width 0.3s ease;
+      }
+
+      #loading-message {
+        margin-top: 15px;
         font-size: 1.2em;
-        margin-bottom: 8px;
+        color: #fff;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
       }
-    
-      /* Barra de progresso mais fina */
+
+      /* -------------- ESTILOS GERAIS -------------- */
+      body {
+        margin: 0;
+        font-family: "Arial", sans-serif;
+        background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+        color: #333;
+        text-align: center;
+        overflow-x: hidden;
+      }
+
+      /* Container das rosas caindo */
+      #roses-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 0;
+      }
+
+      .rose {
+        position: absolute;
+        top: -50px;
+        font-size: 1.5rem;
+        opacity: 0.8;
+        animation-name: fall;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+      }
+
+      @keyframes fall {
+        0% {
+          transform: translateY(0);
+          opacity: 0.8;
+        }
+        90% {
+          opacity: 0.8;
+        }
+        100% {
+          transform: translateY(110vh);
+          opacity: 0;
+        }
+      }
+
+      /* Mensagem principal com wave e mudança de cor */
+      #birthdayMessage {
+        font-size: 2.2em;
+        margin: 50px 12px 20px;
+        min-height: 1em;
+        z-index: 1;
+        word-break: keep-all;
+        overflow-wrap: normal;
+        white-space: pre-wrap;
+        text-align: center;
+      }
+
+      #birthdayMessage .letter {
+        display: inline-block;
+
+        /* ==== FORÇAR ACELERAÇÃO POR GPU ==== */
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        will-change: transform, color;
+        text-rendering: optimizeLegibility;
+
+        /* ==== ANIMAÇÕES MAIS SUAVES ==== */
+        animation: wave 1.2s infinite cubic-bezier(0.645, 0.045, 0.355, 1) both,
+          colorChange 6s infinite ease-in-out;
+        animation-delay: calc(var(--i) * 0.1s), calc(var(--i) * 0.1s);
+      }
+
+      #birthdayMessage .emote {
+        display: inline-block;
+        color: #000;
+      }
+
+      @keyframes wave {
+        0%,
+        100% {
+          transform: translate3d(0, 0, 0);
+        }
+        50% {
+          transform: translate3d(0, -8px, 0);
+        }
+      }
+
+      @keyframes colorChange {
+        0% {
+          color: rgb(255, 0, 0);
+        }
+        20% {
+          color: rgb(255, 127, 0);
+        }
+        40% {
+          color: rgb(255, 255, 0);
+        }
+        60% {
+          color: rgb(0, 255, 0);
+        }
+        80% {
+          color: rgb(0, 0, 255);
+        }
+        100% {
+          color: rgb(127, 0, 255);
+        }
+      }
+
+      /* Estilo das seções (feed responsivo) */
+      .section {
+        background: #fff;
+        padding: 12px;
+        margin: 20px auto;
+        border-radius: 8px;
+        max-width: 320px;
+        width: calc(100% - 24px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.8s ease-out;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+        pointer-events: none; /* Impede interação antes da liberação */
+      }
+      .section.animate {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .section h2 {
+        font-size: 1.5em;
+        margin-bottom: 10px;
+        color: #444;
+      }
+      .section img {
+        width: 100%;
+        aspect-ratio: 3 / 4;
+        object-fit: cover;
+        border-radius: 6px;
+        display: block;
+        background-color: #f0f0f0;
+      }
+
+      /* ====== ESTILOS DO WIDGET DE ÁUDIO ====== */
+      #audioWidget {
+        position: relative;
+        overflow: hidden;
+        background: #fff;
+        border: 2px solid #e91e63;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        padding: 16px;
+        max-width: 320px;
+        margin: 0 auto 20px;
+        display: none; /* até o primeiro card animar */
+        z-index: 1;
+      }
+      #audioWidget .audio-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 0;
+        filter: brightness(0.6);
+      }
+      #audioWidget .controls {
+        position: relative;
+        z-index: 1;
+      }
+      #audioWidget button {
+        background: #e91e63;
+        border: none;
+        color: #fff;
+        width: 48px;
+        height: 48px;
+        font-size: 1.4em;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.1s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        margin-bottom: 12px;
+      }
+      #audioWidget button:hover {
+        background: #d81b60;
+        transform: scale(1.05);
+      }
+      #audioWidget button:active {
+        transform: scale(0.95);
+      }
+      #audioWidget .progress-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
       #audioWidget input[type="range"] {
-        height: 4px;
+        flex-grow: 1;
+        cursor: pointer;
+        height: 6px;
+        appearance: none;
+        background: #f0f0f0;
+        border-radius: 3px;
       }
-    
-      /* Texto de tempo um pouquinho menor */
+      #audioWidget input[type="range"]::-webkit-slider-thumb {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #e91e63;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        -webkit-appearance: none;
+        margin-top: -4px;
+      }
+      #audioWidget input[type="range"]::-moz-range-thumb {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #e91e63;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+      }
+      #audioWidget input[type="range"]::-moz-range-track {
+        background: #f0f0f0;
+        height: 6px;
+        border-radius: 3px;
+      }
+      #audioWidget input[type="range"]::-moz-range-progress {
+        background: #e91e63;
+        height: 6px;
+        border-radius: 3px;
+      }
       #audioWidget .time-display {
-        font-size: 0.8em;
-        min-width: 50px;
+        font-size: 0.9em;
+        min-width: 60px;
+        text-align: right;
+        color: #fff;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
       }
-    }
-
-    #loading-screen {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      transition: opacity 0.5s ease;
-    }
-
-    #loading-progress {
-      width: 80%;
-      max-width: 300px;
-      height: 10px;
-      background: rgba(255, 255, 255, 0.3);
-      border-radius: 5px;
-      margin-top: 20px;
-      overflow: hidden;
-    }
-
-    #loading-progress-bar {
-      height: 100%;
-      width: 0%;
-      background: #e91e63;
-      transition: width 0.3s ease;
-    }
-
-    #loading-message {
-      margin-top: 15px;
-      font-size: 1.2em;
-      color: #fff;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-    }
-
-    /* -------------- ESTILOS GERAIS -------------- */
-    body {
-      margin: 0;
-      font-family: 'Arial', sans-serif;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
-      color: #333;
-      text-align: center;
-      overflow-x: hidden;
-    }
-
-    /* Container das rosas caindo */
-    #roses-container {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-      overflow: hidden;
-      z-index: 0;
-    }
-
-    .rose {
-      position: absolute;
-      top: -50px;
-      font-size: 1.5rem;
-      opacity: 0.8;
-      animation-name: fall;
-      animation-timing-function: linear;
-      animation-iteration-count: infinite;
-    }
-
-    @keyframes fall {
-      0%   { transform: translateY(0); opacity: 0.8; }
-      90%  { opacity: 0.8; }
-      100% { transform: translateY(110vh); opacity: 0; }
-    }
-
-    /* Mensagem principal com wave e mudança de cor */
-    #birthdayMessage {
-      font-size: 2.2em;
-      margin: 50px 12px 20px;
-      min-height: 1em;
-      z-index: 1;
-      word-break: keep-all;
-      overflow-wrap: normal;
-      white-space: pre-wrap;
-      text-align: center;
-    }
-
-    #birthdayMessage .letter {
-      display: inline-block;
-
-      /* ==== FORÇAR ACELERAÇÃO POR GPU ==== */
-      transform: translateZ(0);
-      backface-visibility: hidden;
-      will-change: transform, color;
-      text-rendering: optimizeLegibility;
-
-      /* ==== ANIMAÇÕES MAIS SUAVES ==== */
-      animation: 
-        wave 1.2s infinite cubic-bezier(0.645, 0.045, 0.355, 1) both,
-        colorChange 6s infinite ease-in-out;
-      animation-delay: calc(var(--i) * 0.1s), calc(var(--i) * 0.1s);
-    }
-
-    #birthdayMessage .emote {
-      display: inline-block;
-      color: #000;
-    }
-
-    @keyframes wave {
-      0%, 100% { transform: translate3d(0, 0, 0); }
-      50%      { transform: translate3d(0, -8px, 0); }
-    }
-
-    @keyframes colorChange {
-      0%   { color: rgb(255, 0, 0); }
-      20%  { color: rgb(255, 127, 0); }
-      40%  { color: rgb(255, 255, 0); }
-      60%  { color: rgb(0, 255, 0); }
-      80%  { color: rgb(0, 0, 255); }
-      100% { color: rgb(127, 0, 255); }
-    }
-
-    /* Estilo das seções (feed responsivo) */
-    .section {
-      background: #fff;
-      padding: 12px;
-      margin: 20px auto;
-      border-radius: 8px;
-      max-width: 320px;
-      width: calc(100% - 24px);
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.8s ease-out;
-      text-align: center;
-      position: relative;
-      z-index: 1;
-      pointer-events: none; /* Impede interação antes da liberação */
-    }
-    .section.animate {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .section h2 {
-      font-size: 1.5em;
-      margin-bottom: 10px;
-      color: #444;
-    }
-    .section img {
-      width: 100%;
-      aspect-ratio: 3 / 4;
-      object-fit: cover;
-      border-radius: 6px;
-      display: block;
-      background-color: #f0f0f0;
-    }
-
-    /* ====== ESTILOS DO WIDGET DE ÁUDIO ====== */
-    #audioWidget {
-      position: relative;
-      overflow: hidden;
-      background: #fff;
-      border: 2px solid #e91e63;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      padding: 16px;
-      max-width: 320px;
-      margin: 0 auto 20px;
-      display: none; /* até o primeiro card animar */
-      z-index: 1;
-    }
-    #audioWidget .audio-bg {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      object-fit: cover;
-      z-index: 0;
-      filter: brightness(0.6);
-    }
-    #audioWidget .controls {
-      position: relative;
-      z-index: 1;
-    }
-    #audioWidget button {
-      background: #e91e63;
-      border: none;
-      color: #fff;
-      width: 48px;
-      height: 48px;
-      font-size: 1.4em;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: background 0.3s, transform 0.1s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 1;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-      margin-bottom: 12px;
-    }
-    #audioWidget button:hover {
-      background: #d81b60;
-      transform: scale(1.05);
-    }
-    #audioWidget button:active {
-      transform: scale(0.95);
-    }
-    #audioWidget .progress-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    #audioWidget input[type="range"] {
-      flex-grow: 1;
-      cursor: pointer;
-      height: 6px;
-      appearance: none;
-      background: #f0f0f0;
-      border-radius: 3px;
-    }
-    #audioWidget input[type="range"]::-webkit-slider-thumb {
-      width: 14px; height: 14px;
-      border-radius: 50%;
-      background: #e91e63;
-      border: 2px solid #fff;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      cursor: pointer;
-      -webkit-appearance: none;
-      margin-top: -4px;
-    }
-    #audioWidget input[type="range"]::-moz-range-thumb {
-      width: 14px; height: 14px;
-      border-radius: 50%;
-      background: #e91e63;
-      border: 2px solid #fff;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      cursor: pointer;
-    }
-    #audioWidget input[type="range"]::-moz-range-track {
-      background: #f0f0f0;
-      height: 6px;
-      border-radius: 3px;
-    }
-    #audioWidget input[type="range"]::-moz-range-progress {
-      background: #e91e63;
-      height: 6px;
-      border-radius: 3px;
-    }
-    #audioWidget .time-display {
-      font-size: 0.9em;
-      min-width: 60px;
-      text-align: right;
-      color: #fff;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-    }
-  </style>
-</head>
-<body class="loading">
-
-  <!-- Tela de carregamento -->
-  <div id="loading-screen">
-    <div class="rose" style="position: relative; top: 0; animation: none; font-size: 3rem;">
-      🌹
+    </style>
+  </head>
+  <body class="loading">
+    <!-- Tela de carregamento -->
+    <div id="loading-screen">
+      <div
+        class="rose"
+        style="position: relative; top: 0; animation: none; font-size: 3rem"
+      >
+        🌹
+      </div>
+      <h2>Carregando...</h2>
+      <div id="loading-progress">
+        <div id="loading-progress-bar"></div>
+      </div>
+      <div id="loading-message">0%</div>
     </div>
-    <h2>Carregando...</h2>
-    <div id="loading-progress">
-      <div id="loading-progress-bar"></div>
-    </div>
-    <div id="loading-message">0%</div>
-  </div>
 
-  <!-- Container das rosas caindo -->
-  <div id="roses-container"></div>
+    <!-- Container das rosas caindo -->
+    <div id="roses-container"></div>
 
-  <!-- ÁUDIO DE FUNDO -->
-  <audio id="bgm" src="audio/musica.mp3" loop preload="metadata"></audio>
+    <!-- ÁUDIO DE FUNDO -->
+    <audio id="bgm" src="audio/musica.mp3" loop preload="metadata"></audio>
 
-  <!-- MENSAGEM PRINCIPAL -->
-  <h1 id="birthdayMessage"></h1>
+    <!-- MENSAGEM PRINCIPAL -->
+    <h1 id="birthdayMessage"></h1>
 
-  <!-- Widget de Áudio (inicialmente oculto) -->
-  <div id="audioWidget">
-    <video
-      class="audio-bg"
-      src="https://cdn.pixabay.com/video/2022/09/02/129936-745943770_large.mp4"
-      autoplay
-      muted
-      loop
-    ></video>
-    <div class="controls">
-      <button id="playPauseBtn">►</button>
-      <div class="progress-container">
-        <input type="range" id="audioProgress" value="0" step="0.1" min="0" />
-        <span class="time-display" id="timeDisplay">00:00 / 00:00</span>
+    <!-- Widget de Áudio (inicialmente oculto) -->
+    <div id="audioWidget">
+      <video
+        class="audio-bg"
+        src="https://cdn.pixabay.com/video/2022/09/02/129936-745943770_large.mp4"
+        autoplay
+        muted
+        loop
+      ></video>
+      <div class="controls">
+        <button id="playPauseBtn">►</button>
+        <div class="progress-container">
+          <input type="range" id="audioProgress" value="0" step="0.1" min="0" />
+          <span class="time-display" id="timeDisplay">00:00 / 00:00</span>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Seções de conteúdo com imagens pré-carregadas -->
-  <section class="section">
-    <h2>Ela é do pagode 🎶</h2>
-    <img src="images/IMG_Pagode.png" alt="Foto dela curtindo pagode" />
-  </section>
+    <!-- Seções de conteúdo com imagens pré-carregadas -->
+    <section class="section">
+      <h2>Ela é do pagode 🎶</h2>
+      <img src="images/IMG_Pagode.png" alt="Foto dela curtindo pagode" />
+    </section>
 
-  <section class="section">
-    <h2>Ela quase virou DJ 🎧</h2>
-    <img src="images/IMG_DJ.png" alt="Foto dela como DJ" />
-  </section>
+    <section class="section">
+      <h2>Ela quase virou DJ 🎧</h2>
+      <img src="images/IMG_DJ.png" alt="Foto dela como DJ" />
+    </section>
 
-  <section class="section">
-    <h2>Ela é Maromba 💪</h2>
-    <img src="images/IMG_Maromba.png" alt="Foto dela na academia" />
-  </section>
+    <section class="section">
+      <h2>Ela é Maromba 💪</h2>
+      <img src="images/IMG_Maromba.png" alt="Foto dela na academia" />
+    </section>
 
-  <section class="section">
-    <h2>Ela é Amorosa 🥰</h2>
-    <img src="images/IMG_Amizades.png" alt="Foto dela com amigos" />
-  </section>
+    <section class="section">
+      <h2>Ela é Amorosa 🥰</h2>
+      <img src="images/IMG_Amizades.png" alt="Foto dela com amigos" />
+    </section>
 
-  <section class="section">
-    <h2>Ela Adora Cachoeira 🏞️</h2>
-    <img src="images/IMG_Cachoeira.png" alt="..." />
-  </section>
+    <section class="section">
+      <h2>Ela Adora Cachoeira 🏞️</h2>
+      <img src="images/IMG_Cachoeira.png" alt="..." />
+    </section>
 
-  <section class="section">
-    <h2>Ela Adora Animais 🐳</h2>
-    <img src="images/IMG_Animais.png" alt="Foto dela com animais" />
-  </section>
+    <section class="section">
+      <h2>Ela Adora Animais 🐳</h2>
+      <img src="images/IMG_Animais.png" alt="Foto dela com animais" />
+    </section>
 
-  <section class="section">
-    <h2>Ela é Charmosa 😘</h2>
-    <img src="images/IMG_Amordemaiz.png" alt="Foto dela charmosa" />
-  </section>
-  
-  <section class="section">
-    <h2>Ela Tem classe 🍷</h2>
-    <img src="images/IMG_TemClasse.png" alt="Foto dela elegante" />
-  </section>
+    <section class="section">
+      <h2>Ela é Charmosa 😘</h2>
+      <img src="images/IMG_Amordemaiz.png" alt="Foto dela charmosa" />
+    </section>
 
-  <section class="section">
-    <h2>Ela é Caricata 😜</h2>
-    <img src="images/IMG_Caricata.png" alt="Foto dela fazendo careta" />
-  </section>
+    <section class="section">
+      <h2>Ela Tem classe 🍷</h2>
+      <img src="images/IMG_TemClasse.png" alt="Foto dela elegante" />
+    </section>
 
-  <section class="section">
-    <h2>Ela é Estudiosa 📚</h2>
-    <img src="images/IMG_Estudiosa.png" alt="Foto dela estudando" />
-  </section>
+    <section class="section">
+      <h2>Ela é Caricata 😜</h2>
+      <img src="images/IMG_Caricata.png" alt="Foto dela fazendo careta" />
+    </section>
 
-  <section class="section">
-    <h2>Ela é Romântica ❤️</h2>
-    <img src="images/IMG_Romantica.png" alt="Foto dela em clima romântico" />
-  </section>
+    <section class="section">
+      <h2>Ela é Estudiosa 📚</h2>
+      <img src="images/IMG_Estudiosa.png" alt="Foto dela estudando" />
+    </section>
 
-  <section class="section">
-    <h2>Ela é do crime às vezes 🚓</h2>
-    <img src="images/IMG_Crime.png" alt="Foto dela aprontando" />
-  </section>
+    <section class="section">
+      <h2>Ela é Romântica ❤️</h2>
+      <img src="images/IMG_Romantica.png" alt="Foto dela em clima romântico" />
+    </section>
 
-  <section class="section">
-    <h2>Ela é Mãe de Pet 🦴</h2>
-    <img src="images/IMG_Potassio.png" alt="Foto dela com pet" />
-  </section>
+    <section class="section">
+      <h2>Ela é do crime às vezes 🚓</h2>
+      <img src="images/IMG_Crime.png" alt="Foto dela aprontando" />
+    </section>
 
-  <section class="section">
-    <h2>Ela é Incrível! ⭐</h2>
-    <img src="images/IMG_Amiga.png" alt="Foto dela com amigos" />
-  </section>
+    <section class="section">
+      <h2>Ela é Mãe de Pet 🦴</h2>
+      <img src="images/IMG_Potassio.png" alt="Foto dela com pet" />
+    </section>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Elementos de carregamento
-      const loadingScreen   = document.getElementById('loading-screen');
-      const progressBar     = document.getElementById('loading-progress-bar');
-      const loadingMessage  = document.getElementById('loading-message');
-      window.scrollTo(0, 0);
-  
-      /*----------- 1) EFEITO DE DIGITAÇÃO -------------*/
-      const text = "Feliz aniversário\nAna Paula 🎉🎂💖";
-      const container = document.getElementById('birthdayMessage');
-      let index = 0;
-      const chars = Array.from(text);
-  
-      function typeWriter() {
-        if (index < chars.length) {
-          const char = chars[index];
-          if (char === "\n") {
-            container.appendChild(document.createElement('br'));
+    <section class="section">
+      <h2>Ela é Incrível! ⭐</h2>
+      <img src="images/IMG_Amiga.png" alt="Foto dela com amigos" />
+    </section>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Elementos de carregamento
+        const loadingScreen = document.getElementById("loading-screen");
+        const progressBar = document.getElementById("loading-progress-bar");
+        const loadingMessage = document.getElementById("loading-message");
+        window.scrollTo(0, 0);
+
+        /*----------- 1) EFEITO DE DIGITAÇÃO -------------*/
+        const text = "Feliz aniversário\nAna Paula 🎉🎂💖";
+        const container = document.getElementById("birthdayMessage");
+        let index = 0;
+        const chars = Array.from(text);
+
+        function typeWriter() {
+          if (index < chars.length) {
+            const char = chars[index];
+            if (char === "\n") {
+              container.appendChild(document.createElement("br"));
+              index++;
+              requestAnimationFrame(typeWriter);
+              return;
+            }
+
+            const span = document.createElement("span");
+            span.style.opacity = "0";
+            span.style.transition = "opacity 0.2s ease-in";
+            if (char === " ") {
+              span.className = "letter";
+              span.textContent = "\u00A0";
+              span.style.setProperty("--i", index);
+            } else if (/[A-Za-zÀ-ÖØ-öø-ÿ0-9]/.test(char)) {
+              span.className = "letter";
+              span.textContent = char;
+              span.style.setProperty("--i", index);
+            } else {
+              span.className = "emote";
+              span.textContent = char;
+            }
+
+            container.appendChild(span);
+            requestAnimationFrame(() => {
+              span.style.opacity = "1";
+            });
+
             index++;
-            requestAnimationFrame(typeWriter);
-            return;
+            setTimeout(typeWriter, 40);
           }
-  
-          const span = document.createElement('span');
-          span.style.opacity = '0';
-          span.style.transition = 'opacity 0.2s ease-in';
-          if (char === " ") {
-            span.className = 'letter';
-            span.textContent = "\u00A0";
-            span.style.setProperty('--i', index);
-          }
-          else if (/[A-Za-zÀ-ÖØ-öø-ÿ0-9]/.test(char)) {
-            span.className = 'letter';
-            span.textContent = char;
-            span.style.setProperty('--i', index);
-          } else {
-            span.className = 'emote';
-            span.textContent = char;
-          }
-  
-          container.appendChild(span);
-          requestAnimationFrame(() => {
-            span.style.opacity = '1';
-          });
-  
-          index++;
-          setTimeout(typeWriter, 40);
         }
-      }
-      typeWriter();
-  
-      /*------ 2) QUANTIDADE DE ROSAS ------*/
-      const level = "medio";
-      let roseCount;
-      switch(level) {
-        case "alto":   roseCount = 60; break;
-        case "medio":  roseCount = 40; break;
-        case "baixo":  roseCount = 10; break;
-        default:       roseCount = 20;
-      }
-  
-      /*------ 3) ANIMAÇÃO DAS ROSAS ------*/
-      const containerRoses = document.getElementById('roses-container');
-      for (let i = 0; i < roseCount; i++) {
-        const rose = document.createElement('div');
-        rose.classList.add('rose');
-        rose.textContent = "🌹";
-        rose.style.left = Math.random() * 100 + "vw";
-        rose.style.animationDuration = (6 + Math.random() * 6) + "s";
-        rose.style.animationDelay = Math.random() * 4 + "s";
-        rose.style.fontSize = (1 + Math.random()) + "rem";
-        containerRoses.appendChild(rose);
-      }
-  
-      /*------ 4) PRÉ-CARREGAMENTO DE IMAGENS ------*/
-      const imageUrls = [
-        'images/IMG_Pagode.png',
-        'images/IMG_DJ.png',
-        'images/IMG_Maromba.png',
-        'images/IMG_Caricata.png',
-        'images/IMG_Estudiosa.png',
-        'images/IMG_Romantica.png',
-        'images/IMG_Crime.png',
-        'images/IMG_Amiga.png',
-        'images/IMG_Cachoeira.png',
-        'images/IMG_Potassio.png',
-      ];
-  
-      let loadedImages = 0;
-      const totalImages = imageUrls.length;
-  
-      function preloadImage(url) {
-        return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.src = url;
-          img.onload = () => {
-            loadedImages++;
-            updateProgress();
-            resolve();
-          };
-          img.onerror = () => {
-            loadedImages++;
-            updateProgress();
-            resolve();
-          };
-        });
-      }
-  
-      function updateProgress() {
-        const percent = Math.floor((loadedImages / totalImages) * 100);
-        progressBar.style.width       = percent + '%';
-        loadingMessage.textContent    = percent + '%';
-      }
-  
-      function preloadAllImages() {
-        return Promise.all(imageUrls.map(url => preloadImage(url)));
-      }
-  
-      /*------ 5) ELEMENTOS DE ÁUDIO E VÍDEO ------*/
-      const bgm           = document.getElementById('bgm');
-      const audioWidget   = document.getElementById('audioWidget');
-      const playPauseBtn  = document.getElementById('playPauseBtn');
-      const audioProgress = document.getElementById('audioProgress');
-      const timeDisplay   = document.getElementById('timeDisplay');
-      const videoBg       = document.querySelector('#audioWidget .audio-bg');
-      let firstSectionSeen = false;
-  
-      let scrollInterval = null;
-      let inactivityTimer = null;
-      let musicAutoStarted = false;
-  
-      function autoScroll() {
-        if (scrollInterval) return;
-        scrollInterval = setInterval(() => {
-          if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+        typeWriter();
+
+        /*------ 2) QUANTIDADE DE ROSAS ------*/
+        const level = "medio";
+        let roseCount;
+        switch (level) {
+          case "alto":
+            roseCount = 60;
+            break;
+          case "medio":
+            roseCount = 40;
+            break;
+          case "baixo":
+            roseCount = 10;
+            break;
+          default:
+            roseCount = 20;
+        }
+
+        /*------ 3) ANIMAÇÃO DAS ROSAS ------*/
+        const containerRoses = document.getElementById("roses-container");
+        for (let i = 0; i < roseCount; i++) {
+          const rose = document.createElement("div");
+          rose.classList.add("rose");
+          rose.textContent = "🌹";
+          rose.style.left = Math.random() * 100 + "vw";
+          rose.style.animationDuration = 6 + Math.random() * 6 + "s";
+          rose.style.animationDelay = Math.random() * 4 + "s";
+          rose.style.fontSize = 1 + Math.random() + "rem";
+          containerRoses.appendChild(rose);
+        }
+
+        /*------ 4) PRÉ-CARREGAMENTO DE IMAGENS ------*/
+        const imageUrls = [
+          "images/IMG_Pagode.png",
+          "images/IMG_DJ.png",
+          "images/IMG_Maromba.png",
+          "images/IMG_Caricata.png",
+          "images/IMG_Estudiosa.png",
+          "images/IMG_Romantica.png",
+          "images/IMG_Crime.png",
+          "images/IMG_Amiga.png",
+          "images/IMG_Cachoeira.png",
+          "images/IMG_Potassio.png",
+        ];
+
+        let loadedImages = 0;
+        const totalImages = imageUrls.length;
+
+        function preloadImage(url) {
+          return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = url;
+            img.onload = () => {
+              loadedImages++;
+              updateProgress();
+              resolve();
+            };
+            img.onerror = () => {
+              loadedImages++;
+              updateProgress();
+              resolve();
+            };
+          });
+        }
+
+        function updateProgress() {
+          const percent = Math.floor((loadedImages / totalImages) * 100);
+          progressBar.style.width = percent + "%";
+          loadingMessage.textContent = percent + "%";
+        }
+
+        function preloadAllImages() {
+          return Promise.all(imageUrls.map((url) => preloadImage(url)));
+        }
+
+        /*------ 5) ELEMENTOS DE ÁUDIO E VÍDEO ------*/
+        const bgm = document.getElementById("bgm");
+        const audioWidget = document.getElementById("audioWidget");
+        const playPauseBtn = document.getElementById("playPauseBtn");
+        const audioProgress = document.getElementById("audioProgress");
+        const timeDisplay = document.getElementById("timeDisplay");
+        const videoBg = document.querySelector("#audioWidget .audio-bg");
+        let firstSectionSeen = false;
+
+        let scrollInterval = null;
+        let inactivityTimer = null;
+        let musicAutoStarted = false;
+
+        function autoScroll() {
+          if (scrollInterval) return;
+          scrollInterval = setInterval(() => {
+            if (
+              window.innerHeight + window.scrollY >=
+              document.body.offsetHeight
+            ) {
+              clearInterval(scrollInterval);
+              scrollInterval = null;
+            } else {
+              window.scrollBy(0, 1);
+            }
+          }, 20);
+        }
+
+        function stopAutoScroll() {
+          if (scrollInterval) {
             clearInterval(scrollInterval);
             scrollInterval = null;
-          } else {
-            window.scrollBy(0, 1);
           }
-        }, 20);
-      }
-  
-      function stopAutoScroll() {
-        if (scrollInterval) {
-          clearInterval(scrollInterval);
-          scrollInterval = null;
+          clearTimeout(inactivityTimer);
+          inactivityTimer = setTimeout(() => {
+            autoScroll();
+          }, 5000);
         }
-        clearTimeout(inactivityTimer);
-        inactivityTimer = setTimeout(() => {
-          autoScroll();
-        }, 5000);
-      }
-  
-      /*------ 6) REMOÇÃO DO LOADING E ATIVAÇÃO APÓS 3s ------*/
-      preloadAllImages()
-        .catch(() => console.log("Algumas imagens não carregaram"))
-        .finally(() => {
-          setTimeout(() => {
-            loadingScreen.style.opacity = '0';
+
+        /*------ 6) REMOÇÃO DO LOADING E ATIVAÇÃO APÓS 3s ------*/
+        preloadAllImages()
+          .catch(() => console.log("Algumas imagens não carregaram"))
+          .finally(() => {
             setTimeout(() => {
-              loadingScreen.style.display = 'none';
-              document.body.classList.remove('loading');
-  
-              // Habilita scroll
-              document.body.style.overflowY = 'auto';
-  
-              // Ativa seções e observer
-              const sections = document.querySelectorAll('.section');
-              const observer = new IntersectionObserver((entries, obs) => {
-                entries.forEach(entry => {
-                  if (entry.isIntersecting) {
-                    entry.target.classList.add('animate');
-                    obs.unobserve(entry.target);
-                    if (!firstSectionSeen) {
-                      firstSectionSeen = true;
-                      showAudioWidget();
-                    }
-                  }
+              loadingScreen.style.opacity = "0";
+              setTimeout(() => {
+                loadingScreen.style.display = "none";
+                document.body.classList.remove("loading");
+
+                // Habilita scroll
+                document.body.style.overflowY = "auto";
+
+                // Ativa seções e observer
+                const sections = document.querySelectorAll(".section");
+                const observer = new IntersectionObserver(
+                  (entries, obs) => {
+                    entries.forEach((entry) => {
+                      if (entry.isIntersecting) {
+                        entry.target.classList.add("animate");
+                        obs.unobserve(entry.target);
+                        if (!firstSectionSeen) {
+                          firstSectionSeen = true;
+                          showAudioWidget();
+                        }
+                      }
+                    });
+                  },
+                  { threshold: 0.1 }
+                );
+                sections.forEach((sec) => {
+                  sec.style.pointerEvents = "auto";
+                  observer.observe(sec);
                 });
-              }, { threshold: 0.1 });
-              sections.forEach(sec => {
-                sec.style.pointerEvents = 'auto';
-                observer.observe(sec);
-              });
-              window.scrollTo(0, 0);
-            }, 500);
-          }, 3000);
-        });
-  
-      /*====== 7) EXIBE E CONTROLA O WIDGET DE ÁUDIO ======*/
-      function showAudioWidget() {
-        audioWidget.style.display = 'block';
-        videoBg.playbackRate = 0.5;
-        audioProgress.disabled = true;
-        bgm.load();
-  
-        bgm.addEventListener('loadedmetadata', () => {
-          audioProgress.max = 100;
-          audioProgress.disabled = false;
-          updateProgressBarBackground();
-          updateTimeDisplay();
-        });
-  
-        bgm.addEventListener('timeupdate', () => {
-          if (!isNaN(bgm.duration) && bgm.duration > 0) {
-            const percent = (bgm.currentTime / bgm.duration) * 100;
-            audioProgress.value = percent;
+                window.scrollTo(0, 0);
+              }, 500);
+            }, 3000);
+          });
+
+        /*====== 7) EXIBE E CONTROLA O WIDGET DE ÁUDIO ======*/
+        function showAudioWidget() {
+          audioWidget.style.display = "block";
+          videoBg.playbackRate = 0.5;
+          audioProgress.disabled = true;
+          bgm.load();
+
+          bgm.addEventListener("loadedmetadata", () => {
+            console.log("[audio] loadedmetadata, duration:", bgm.duration);
+            audioProgress.max = 100;
+            audioProgress.disabled = false;
             updateProgressBarBackground();
             updateTimeDisplay();
+          });
+
+          bgm.addEventListener("play", () => {
+            console.log(
+              "[audio] event: play, currentTime:",
+              bgm.currentTime,
+              "readyState:",
+              bgm.readyState
+            );
+          });
+          bgm.addEventListener("playing", () => {
+            console.log("[audio] event: playing");
+          });
+          bgm.addEventListener("error", (e) => {
+            console.error("[audio] error event:", e);
+          });
+
+          bgm.addEventListener("timeupdate", () => {
+            if (!isNaN(bgm.duration) && bgm.duration > 0) {
+              const percent = (bgm.currentTime / bgm.duration) * 100;
+              audioProgress.value = percent;
+              updateProgressBarBackground();
+              updateTimeDisplay();
+            }
+          });
+
+          playPauseBtn.addEventListener("click", () => {
+            console.log(
+              "[widget] playPauseBtn clicked, bgm.paused=",
+              bgm.paused
+            );
+            if (isNaN(bgm.duration) || bgm.duration === 0) return;
+            if (bgm.paused) {
+              bgm
+                .play()
+                .then(() => {
+                  console.log("[audio] play() resolved from button");
+                  playPauseBtn.textContent = "❚❚";
+                })
+                .catch((err) => {
+                  console.warn("[audio] play() rejected from button:", err);
+                });
+            } else {
+              bgm.pause();
+              console.log("[audio] paused via button");
+              playPauseBtn.textContent = "►";
+            }
+            stopAutoScroll();
+          });
+
+          audioProgress.addEventListener("input", () => {
+            if (!isNaN(bgm.duration) && bgm.duration > 0) {
+              const seconds =
+                (parseFloat(audioProgress.value) / 100) * bgm.duration;
+              bgm.currentTime = seconds;
+              updateProgressBarBackground();
+              updateTimeDisplay();
+            }
+            stopAutoScroll();
+          });
+
+          bgm.addEventListener("ended", () => {
+            console.log("[audio] ended");
+            playPauseBtn.textContent = "►";
+          });
+
+          function onFirstUserInteraction(evt) {
+            console.log(
+              "[interaction] event:",
+              evt.type,
+              "readyState before play:",
+              bgm.readyState
+            );
+            window.removeEventListener("wheel", onFirstUserInteraction);
+            window.removeEventListener("touchstart", onFirstUserInteraction);
+            window.removeEventListener("pointerdown", onFirstUserInteraction);
+            window.removeEventListener("touchend", onFirstUserInteraction);
+            window.removeEventListener("click", onFirstUserInteraction);
+
+            autoScroll();
           }
-        });
-  
-        playPauseBtn.addEventListener('click', () => {
-          if (isNaN(bgm.duration) || bgm.duration === 0) return;
-          if (bgm.paused) {
-            bgm.play().catch(() => {});
-            playPauseBtn.textContent = '❚❚';
-          } else {
-            bgm.pause();
-            playPauseBtn.textContent = '►';
+
+          window.addEventListener("wheel", onFirstUserInteraction, {
+            passive: true,
+          });
+          window.addEventListener("touchstart", onFirstUserInteraction, {
+            passive: true,
+          });
+          window.addEventListener("pointerdown", onFirstUserInteraction, {
+            passive: true,
+          });
+          window.addEventListener("touchend", onFirstUserInteraction, {
+            passive: true,
+          });
+          window.addEventListener("click", onFirstUserInteraction, {
+            passive: true,
+          });
+
+          function onUserScroll() {
+            stopAutoScroll();
           }
-          stopAutoScroll();
-        });
-  
-        audioProgress.addEventListener('input', () => {
-          if (!isNaN(bgm.duration) && bgm.duration > 0) {
-            const seconds = (parseFloat(audioProgress.value) / 100) * bgm.duration;
-            bgm.currentTime = seconds;
-            updateProgressBarBackground();
-            updateTimeDisplay();
-          }
-          stopAutoScroll();
-        });
-  
-        bgm.addEventListener('ended', () => {
-          playPauseBtn.textContent = '►';
-        });
-  
-        function onFirstUserInteraction() {
-          window.removeEventListener('wheel', onFirstUserInteraction);
-          window.removeEventListener('touchstart', onFirstUserInteraction);
-          window.removeEventListener('click', onFirstUserInteraction);
-          bgm.play().catch(() => {});
-          playPauseBtn.textContent = '❚❚';
-          musicAutoStarted = true;
-          autoScroll();
+          window.addEventListener("wheel", onUserScroll, { passive: true });
+          window.addEventListener("touchstart", onUserScroll, {
+            passive: true,
+          });
+          window.addEventListener("pointerdown", onUserScroll, {
+            passive: true,
+          });
         }
-        window.addEventListener('wheel', onFirstUserInteraction, { passive: true });
-        window.addEventListener('touchstart', onFirstUserInteraction, { passive: true });
-        window.addEventListener('click', onFirstUserInteraction, { passive: true });
-  
-        function onUserScroll() {
-          stopAutoScroll();
+
+        bgm.volume = 0.2;
+
+        function formatTime(sec) {
+          const minutes = Math.floor(sec / 60);
+          const seconds = Math.floor(sec % 60);
+          return (
+            String(minutes).padStart(2, "0") +
+            ":" +
+            String(seconds).padStart(2, "0")
+          );
         }
-        window.addEventListener('wheel', onUserScroll, { passive: true });
-        window.addEventListener('touchstart', onUserScroll, { passive: true });
-        window.addEventListener('click', onUserScroll, { passive: true });
-      }
-  
-      bgm.volume = 0.2;
-  
-      function formatTime(sec) {
-        const minutes = Math.floor(sec / 60);
-        const seconds = Math.floor(sec % 60);
-        return String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
-      }
-  
-      function updateTimeDisplay() {
-        const current = formatTime(bgm.currentTime);
-        const total = isNaN(bgm.duration) ? '00:00' : formatTime(bgm.duration);
-        timeDisplay.textContent = `${current} / ${total}`;
-      }
-  
-      function updateProgressBarBackground() {
-        if (!bgm.duration || isNaN(bgm.duration)) return;
-        const percent = (bgm.currentTime / bgm.duration) * 100;
-        audioProgress.style.backgroundColor = '#f0f0f0';
-        audioProgress.style.backgroundImage = 'linear-gradient(to right, #e91e63, #e91e63)';
-        audioProgress.style.backgroundRepeat = 'no-repeat';
-        audioProgress.style.backgroundSize = `${percent}% 100%`;
-      }
-    });
-  </script>
-</body>
+
+        function updateTimeDisplay() {
+          const current = formatTime(bgm.currentTime);
+          const total = isNaN(bgm.duration)
+            ? "00:00"
+            : formatTime(bgm.duration);
+          timeDisplay.textContent = `${current} / ${total}`;
+        }
+
+        function updateProgressBarBackground() {
+          if (!bgm.duration || isNaN(bgm.duration)) return;
+          const percent = (bgm.currentTime / bgm.duration) * 100;
+          audioProgress.style.backgroundColor = "#f0f0f0";
+          audioProgress.style.backgroundImage =
+            "linear-gradient(to right, #e91e63, #e91e63)";
+          audioProgress.style.backgroundRepeat = "no-repeat";
+          audioProgress.style.backgroundSize = `${percent}% 100%`;
+        }
+      });
+    </script>
+  </body>
 </html>
