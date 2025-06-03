@@ -5,6 +5,51 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Feliz Aniversário Ana Paula</title>
   <style>
+    /* ========== ESTILOS DE CARREGAMENTO ========== */
+    body.loading {
+      overflow: hidden;
+      height: 100vh;
+    }
+    
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      transition: opacity 0.5s ease;
+    }
+    
+    #loading-progress {
+      width: 80%;
+      max-width: 300px;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 5px;
+      margin-top: 20px;
+      overflow: hidden;
+    }
+    
+    #loading-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #e91e63;
+      transition: width 0.3s ease;
+    }
+    
+    #loading-message {
+      margin-top: 15px;
+      font-size: 1.2em;
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+
     /* -------------- ESTILOS GERAIS -------------- */
     body {
       margin: 0;
@@ -47,9 +92,8 @@
 
     /* Mensagem principal com wave e mudança de cor */
     #birthdayMessage {
-      position: relative;
-      font-size: 2.2em;                  /* Diminuído de 3em */
-      margin: 50px 12px;                 /* 12px nas laterais para fundo rosa */
+      font-size: 2.2em;
+      margin: 50px 12px 20px;
       min-height: 1em;
       z-index: 1; /* Fica acima das rosas */
       word-break: keep-all; /* Não quebra palavras no meio */
@@ -120,73 +164,82 @@
       aspect-ratio: 3 / 4;
       object-fit: cover;
       border-radius: 6px;
+      display: block; /* Evita espaço abaixo da imagem */
     }
   </style>
 </head>
-<body>
+<body class="loading">
+
+  <!-- Tela de carregamento -->
+  <div id="loading-screen">
+    <div class="rose" style="position: relative; top: 0; animation: none; font-size: 3rem;">🌹</div>
+    <h2>Carregando...</h2>
+    <div id="loading-progress">
+      <div id="loading-progress-bar"></div>
+    </div>
+    <div id="loading-message">0%</div>
+  </div>
 
   <!-- Container das rosas caindo -->
   <div id="roses-container"></div>
 
   <!-- ÁUDIO DE FUNDO -->
-  <!-- Coloque o arquivo na pasta audio/ com nome musica.mp3 -->
-  <audio id="bgm" src="audio/musica.mp3" autoplay loop></audio>
+  <audio id="bgm" src="audio/musica.mp3" loop></audio>
 
-  <!-- MENSAGEM PRINCIPAL: duas linhas para não quebrar no meio -->
+  <!-- MENSAGEM PRINCIPAL: já posicionada no topo -->
   <h1 id="birthdayMessage"></h1>
 
-  <!-- TÓPICO 1: Ela é do pagode -->
+  <!-- Seções de conteúdo -->
   <section class="section">
     <h2>Ela é do pagode 🎶</h2>
     <img src="images/IMG_Pagode.png" alt="Foto dela curtindo pagode">
   </section>
 
-  <!-- TÓPICO 2: Ela quase fez carreira de DJ -->
   <section class="section">
     <h2>Ela quase fez carreira de DJ 🎧</h2>
     <img src="images/IMG_DJ.png" alt="Foto dela como DJ">
   </section>
 
-  <!-- TÓPICO 3: Ela é Maromba -->
   <section class="section">
     <h2>Ela é Maromba 💪</h2>
     <img src="images/IMG_Maromba.png" alt="Foto dela na academia">
   </section>
 
-  <!-- TÓPICO 4: Ela é Caricata -->
   <section class="section">
     <h2>Ela é Caricata 😜</h2>
     <img src="images/IMG_Caricata.png" alt="Foto dela fazendo careta">
   </section>
 
-  <!-- TÓPICO 5: Ela é Estudiosa -->
   <section class="section">
     <h2>Ela é Estudiosa 📚</h2>
     <img src="images/IMG_Estudiosa.png" alt="Foto dela estudando">
   </section>
 
-  <!-- TÓPICO 6: Ela é Romântica -->
-  <section class="section">
-    <h2>Ela é do crime às vezes 🚓</h2>
-    <img src="images/IMG_Crime.png" alt="Foto dela aprontando">
-  </section>
-
-
-  <!-- TÓPICO 7: Ela é do crime às vezes -->
   <section class="section">
     <h2>Ela é Romântica ❤️</h2>
     <img src="images/IMG_Romantica.png" alt="Foto dela em clima romântico">
   </section>
 
-  <!-- TÓPICO 8: Ela é Melhor Amiga -->
+  <section class="section">
+    <h2>Ela é do crime às vezes 🚓</h2>
+    <img src="images/IMG_Crime.png" alt="Foto dela aprontando">
+  </section>
+
   <section class="section">
     <h2>Ela é Melhor Amiga 🤗</h2>
     <img src="images/IMG_Amiga.png" alt="Foto dela com amigos">
   </section>
 
-  <!-- SCRIPT PARA ANIMAÇÕES E ROSAS CAINDO -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      // Elementos da tela de carregamento
+      const loadingScreen = document.getElementById('loading-screen');
+      const progressBar = document.getElementById('loading-progress-bar');
+      const loadingMessage = document.getElementById('loading-message');
+      
+      // Forçar scroll para o topo
+      window.scrollTo(0, 0);
+      
       /*----------- 1) EFEITO DE DIGITAÇÃO COM WAVE E CORES -------------*/
       const text = "Feliz aniversário\nAna Paula 🎉🎂💖";
       const container = document.getElementById('birthdayMessage');
@@ -224,19 +277,7 @@
       }
       typeWriter();
 
-      /*------ 2) INTERSECTIONOBSERVER PARA ANIMAR AS SEÇÕES ------*/
-      const sections = document.querySelectorAll('.section');
-      const observer = new IntersectionObserver((entries, obs) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animate');
-            obs.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.5 });
-      sections.forEach(sec => observer.observe(sec));
-
-      /*------ 3) QUANTIDADES DE ROSAS (alto, médio, baixo) ------*/
+      /*------ 2) QUANTIDADES DE ROSAS ------*/
       const level = "medio"; // "alto", "medio" ou "baixo"
       let roseCount;
       switch(level) {
@@ -253,7 +294,7 @@
           roseCount = 20;
       }
 
-      /*------ 4) CRIAÇÃO E ANIMAÇÃO DAS EMOJIS DE ROSA ------*/
+      /*------ 3) CRIAÇÃO E ANIMAÇÃO DAS ROSAS ------*/
       const containerRoses = document.getElementById('roses-container');
       for (let i = 0; i < roseCount; i++) {
         const rose = document.createElement('div');
@@ -270,14 +311,70 @@
         containerRoses.appendChild(rose);
       }
 
-      /*------ 5) AJUSTAR VOLUME DO ÁUDIO E INICIAR NO SCROLL ------*/
+      /*------ 4) ÁUDIO: VOLUME E TENTATIVAS DE INICIO ------------*/
       const bgm = document.getElementById('bgm');
       bgm.volume = 0.15; // Define volume em 15%
-      function playOnScroll() {
-        bgm.play().catch(() => { /* ignorar erro se ainda bloqueado */ });
-        document.removeEventListener('scroll', playOnScroll);
+
+      // Tenta tocar imediatamente
+      const playAttempt = bgm.play();
+      if (playAttempt !== undefined) {
+        playAttempt.catch(() => {
+          // Se falhar, adiciona eventos para tentar iniciar
+          const tryPlay = () => {
+            bgm.play().catch(() => { /* ignora falha */ });
+          };
+          // Inicia no primeiro scroll
+          document.addEventListener('scroll', tryPlay, { once: true });
+          // Inicia no primeiro touchstart (celular)
+          document.addEventListener('touchstart', tryPlay, { once: true });
+          // Inicia no primeiro keydown (teclado)
+          document.addEventListener('keydown', tryPlay, { once: true });
+          // Inicia no primeiro mousemove (desktop)
+          document.addEventListener('mousemove', tryPlay, { once: true });
+        });
+
+        bgm.play();
       }
-      document.addEventListener('scroll', playOnScroll);
+
+      /*------ 5) BARRA DE PROGRESSO DE 3 SEGUNDOS ------*/
+      const progressDuration = 3000; // 3 segundos
+      const progressSteps = 100;
+      const intervalTime = progressDuration / progressSteps;
+      let progress = 0;
+      
+      const progressInterval = setInterval(() => {
+        progress++;
+        progressBar.style.width = progress + '%';
+        loadingMessage.textContent = progress + '%';
+        
+        if (progress >= 100) {
+          clearInterval(progressInterval);
+          // Esconde a tela de carregamento
+          loadingScreen.style.opacity = '0';
+          
+          // Após a transição, remove completamente
+          setTimeout(() => {
+            loadingScreen.style.display = 'none';
+            document.body.classList.remove('loading');
+            
+            // Inicia observador de interseção para animar seções
+            const sections = document.querySelectorAll('.section');
+            const observer = new IntersectionObserver((entries, obs) => {
+              entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add('animate');
+                  obs.unobserve(entry.target);
+                }
+              });
+            }, { threshold: 0.1 });
+            
+            sections.forEach(sec => observer.observe(sec));
+            
+            // Força scroll para o topo novamente
+            window.scrollTo(0, 0);
+          }, 500);
+        }
+      }, intervalTime);
     });
   </script>
 </body>
